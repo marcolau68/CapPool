@@ -56,3 +56,4 @@ def download_constituents_data():
 
 # download_ticker_data("MMM")
 download_constituents_data()
+# print("Test")
