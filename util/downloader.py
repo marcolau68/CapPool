@@ -37,6 +37,8 @@ def download_ticker_data(ticker):
     # Find Log Returns
     df["log_returns"] = np.emath.log(df.Close / df.Close.shift(1))
 
+    df["log_returns"].fillna(value=0, inplace=True)
+
     # Write data to csv and save to raw_data folder
     path = "raw_data/" + ticker + ".csv"
     df.to_csv(path)
@@ -54,6 +56,6 @@ def download_constituents_data():
     return None
 
 
-# download_ticker_data("MMM")
-download_constituents_data()
+download_ticker_data("MMM")
+# download_constituents_data()
 # print("Test")
