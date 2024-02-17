@@ -21,6 +21,7 @@ def download_tickers():
         tickers.append(ticker)
 
     tickers = [s.replace('\n', '') for s in tickers]
+    tickers.sort()
     
     return tickers
 
@@ -63,3 +64,4 @@ def download_constituents_data():
 # download_ticker_data("KO")
 download_constituents_data()
 # print("Test")
+
