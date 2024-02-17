@@ -28,6 +28,10 @@ def download_ticker_data(ticker):
     # Download ticker data
     df = yf.download(ticker, start=START_DATE, end=END_DATE)
 
+    if len(df) == 0:
+        print(f"{ticker} download unsuccessful")
+        return None
+
     # Drop the listed columns
     df = df.drop(["Open", "High", "Low", "Volume", "Close"], axis = 1)
 
@@ -36,10 +40,10 @@ def download_ticker_data(ticker):
 
     # Find Log Returns
     df["log_returns"] = np.emath.log(df.Close / df.Close.shift(1))
-
     df["log_returns"].fillna(value=0, inplace=True)
 
     # Write data to csv and save to raw_data folder
+    ticker = ticker.split(".")[0]
     path = "raw_data/" + ticker + ".csv"
     df.to_csv(path)
 
@@ -56,6 +60,6 @@ def download_constituents_data():
     return None
 
 
-download_ticker_data("MMM")
-# download_constituents_data()
+# download_ticker_data("KO")
+download_constituents_data()
 # print("Test")

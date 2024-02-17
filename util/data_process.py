@@ -5,7 +5,8 @@ import pandas as pd
 # zscore calculated with a rolling window of some period, default to 252
 # assuming Gaussian, zscore standardizes data. subtract mean and divide difference by std
 def process_data(ticker, window):
-    df = pd.read_csv(f"raw_data/{ticker}.csv")
+    df = pd.read_csv(f"raw_data/{ticker}.csv", index_col="Date")
+
     df["log_returns_zscore"] = (df["log_returns"] - df["log_returns"].rolling(window, min_periods=1).mean()) / df["log_returns"].rolling(window, min_periods=1).std()
     df["log_returns_zscore"].fillna(value=0, inplace=True)
 
@@ -30,12 +31,12 @@ def process_all_data(window=252):
     return None
             
 
-
-
-ticker = "MMM"
-process_data(ticker, 252)
+ticker = "KO"
+# process_data(ticker, 252)
 
 # print(stock_df)
+
+process_all_data()
 
 
 
