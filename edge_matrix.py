@@ -68,23 +68,6 @@ def load_correlation_matrix():
 
     return corr_matrix
 
-# Takes forever... 
-# def get_dtw_matrix_slow():
-#     data = load_zscore_data()
-#     n = data.shape[1]
-#     matrix = np.zeros((n, n))
-
-#     for i in range(n):
-#         for j in range(i+1, n):
-#             col_1 = constants.TICKERS[i] + "_log_returns_zscore"
-#             col_2 = constants.TICKERS[j] + "_log_returns_zscore"
-            
-#             tmp = get_dtw(data[col_1].values, data[col_2].values)
-#             matrix[i][j] = tmp
-#             matrix[j][i] = tmp
-
-#     return matrix
-
 # Use matrix DTW and set window size for DTW
 def get_dtw_matrix(window=252):
     data = load_zscore_data()
