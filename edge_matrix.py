@@ -10,10 +10,6 @@ def get_correlation(x, y):
     # -1 to 1
     return np.corrcoef(x, y)[0][1]
 
-def get_dtw(x, y):
-    # 0 to infinity...? 0 is identical
-    return dtw.distance(x, y)
-
 def get_covariance(x, y):
     # -inf to inf.
     return np.cov(x, y)[0][1]
@@ -57,16 +53,6 @@ def get_correlation_matrix():
 
     return matrix
 
-def write_correlation_matrix():
-    corr_matrix = get_correlation_matrix()
-    np.savetxt("graph_data/correlation_matrix.csv", corr_matrix, delimiter=",")
-
-    return None
-
-def load_correlation_matrix():
-    corr_matrix = np.loadtxt(open("graph_data/correlation_matrix.csv", "rb"), delimiter=",")
-
-    return corr_matrix
 
 # Use matrix DTW and set window size for DTW
 def get_dtw_matrix(window=252):
@@ -74,17 +60,6 @@ def get_dtw_matrix(window=252):
     data_np = data.to_numpy()
     data_np = data_np[-window:].transpose()
     return dtw.distance_matrix_fast(data_np)
-
-def write_dtw_matrix():
-    dtw_matrix = get_dtw_matrix()
-    np.savetxt("graph_data/dtw_matrix.csv", dtw_matrix, delimiter=",")
-
-    return None
-
-def load_dtw_matrix():
-    dtw_matrix = np.loadtxt(open("graph_data/dtw_matrix.csv", "rb"), delimiter=",")
-
-    return dtw_matrix
 
 
 def get_precision_matrix():
@@ -105,20 +80,37 @@ def get_precision_matrix():
 
     return precision_matrix
 
-def write_precision_matrix():
-    precision_matrix = get_precision_matrix()
-    np.savetxt("graph_data/precision_matrix.csv", precision_matrix, delimiter=",")
+
+def load_edge_matrix(mode="precision"):
+    if mode not in constants.EDGE_MODES:
+        print("Invalid mode")
+        return None
+    
+    edge_matrix = np.loadtxt(open(f"graph_data/{mode}_matrix.csv", "rb"), delimiter=",")
+    return edge_matrix
+
+
+def write_edge_matrix(mode="precision"):
+    edge_matrix = None
+
+    if mode == "correlation":
+        edge_matrix = get_correlation_matrix()
+    elif mode == "dtw":
+        edge_matrix = get_dtw_matrix()
+    elif mode == "precision":
+        edge_matrix = get_precision_matrix()
+    else:
+        print("Invalid mode")
+        return None
+
+    np.savetxt(f"graph_data/{mode}_matrix.csv", edge_matrix, delimiter=",")
 
     return None
 
-def load_precision_matrix():
-    precision_matrix = np.loadtxt(open("graph_data/precision_matrix.csv", "rb"), delimiter=",")
-
-    return precision_matrix
 
 
 
-write_dtw_matrix()
+write_edge_matrix("dtw")
 
 # print(all_data)
 
