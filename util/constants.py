@@ -34,6 +34,13 @@ TICKERS = ['A', 'AAL', 'AAPL', 'ABBV', 'ABNB', 'ABT', 'ACGL', 'ACN', 'ADBE', 'AD
            'WBD', 'WDC', 'WEC', 'WELL', 'WFC', 'WHR', 'WM', 'WMB', 'WMT', 'WRB', 'WRK', 'WST', 'WTW', 'WY', 'WYNN', 'XEL', 'XOM', 
            'XRAY', 'XYL', 'YUM', 'ZBH', 'ZBRA', 'ZION', 'ZTS']
 
+# Evaluation tickers
+EVAL_TICKERS = ["KO", "AAPL", "BAC", "XOM", "JPM", "BA", "DIS"]
 
+# Edge matrix modes
+EDGE_MODES = ["correlation", "dtw", "precision"]
+
+# Train Test Split Date
+TRAIN_CUTOFF_INDEX = 4530
 
 

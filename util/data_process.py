@@ -35,15 +35,37 @@ def process_all_data(window=252):
                 print(ticker)
     
     return None
+
+def var_process_data():
+    all_returns = None
+
+    for ticker in constants.TICKERS:
+        filename = f"{ticker}.csv"
+        f = os.path.join("raw_data", filename)
+
+        if os.path.isfile(f):
+            df = pd.read_csv(f"raw_data/{ticker}.csv", index_col="Date")
+            df = df.drop(columns=["Close"]).rename(columns={"log_returns": f"{ticker}_log_returns"})
+
+            if all_returns is None:
+                all_returns = df.copy()
+            else:
+                all_returns[f"{ticker}_log_returns"] = df[f"{ticker}_log_returns"]
+    
+    all_returns.fillna(0, inplace=True)
+    print(all_returns)
+
+    path = "benchmark_data/all_log_returns.csv"
+    all_returns.to_csv(path)
+    
+    return None
             
 
-ticker = "KO"
+# ticker = "KO"
 # process_data(ticker, 252)
+# process_all_data()
 
-# print(stock_df)
-
-process_all_data()
-
+var_process_data()
 
 
 
