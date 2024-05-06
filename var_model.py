@@ -14,15 +14,14 @@ results = model.fit(1)
 
 # Calculate predictions
 resid = results.resid
-pred_train = (df - resid).fillna(0)
-
-pred_test = df.copy()
+pred_train = (df[:constants.TRAIN_CUTOFF_INDEX] - resid).fillna(0)
 
 forecast = results.forecast(df.values[:constants.TRAIN_CUTOFF_INDEX], df.shape[0] - constants.TRAIN_CUTOFF_INDEX)
-pred_test[constants.TRAIN_CUTOFF_INDEX:] = forecast
+pred_test = pd.DataFrame(data=forecast, index=df[constants.TRAIN_CUTOFF_INDEX:].index, columns=df.columns)
 
 # Isolate evaluation tickers
 selected_columns = [ s + "_log_returns" for s in constants.EVAL_TICKERS ]
+stock_num = len(constants.EVAL_TICKERS)
 
 selected_resid = resid[selected_columns]
 pred_train = pred_train[selected_columns]
@@ -35,12 +34,12 @@ baseline_accuracy = true.gt(0).sum() / total
 
 # Calculate VAR model accuracy in sample
 train_total = constants.TRAIN_CUTOFF_INDEX
-compare_train = pred_train[:constants.TRAIN_CUTOFF_INDEX].where(pred_train * true > 0)
+compare_train = pred_train.where(pred_train * true[:constants.TRAIN_CUTOFF_INDEX] > 0)
 var_accuracy_train = compare_train.count() / train_total
 
 # Calculate VAR model accuracy out of sample
 test_total = df.shape[0] - constants.TRAIN_CUTOFF_INDEX
-compare_test = pred_test[constants.TRAIN_CUTOFF_INDEX:].where(pred_test * true > 0)
+compare_test = pred_test.where(pred_test * true[constants.TRAIN_CUTOFF_INDEX:] > 0)
 var_accuracy_test = compare_test.count() / test_total
 
 # Calculate VAR MSE
@@ -50,7 +49,7 @@ mse_train = ((true[:constants.TRAIN_CUTOFF_INDEX] - pred_train[:constants.TRAIN_
 mse_test = ((true[constants.TRAIN_CUTOFF_INDEX:] - pred_test[constants.TRAIN_CUTOFF_INDEX:]) ** 2).mean()
 
 
-# Print results
+# Print accuracy results
 print("Baseline accuracy")
 print("################################")
 print(baseline_accuracy)
@@ -66,18 +65,54 @@ print("################################")
 print(var_accuracy_test)
 print("################################")
 print("\n")
-print("VAR Mean Squared Error Train")
+
+
+# Returns Evaluation
+n = df.shape[0]
+
+# Baseline
+uniform_weights = np.ones((n, stock_num)) / stock_num
+baseline_returns = np.sum((np.exp(true[:]) - 1) * uniform_weights, axis=1)
+cum_baseline_returns = np.exp(np.log(baseline_returns+1).cumsum())
+baseline_std = ((np.exp(baseline_returns)-1) * 100).std()
+
+baseline_annual_returns = (np.power(cum_baseline_returns.loc[n-1], 1/23) - 1) 
+baseline_sharpe = baseline_annual_returns / baseline_std
+
+# Train
+train_weights = np.where(pred_train > 0, 1, -1) / 7
+train_returns = np.sum((np.exp(true[:constants.TRAIN_CUTOFF_INDEX]) - 1) * train_weights, axis=1)
+cum_train_returns = np.exp(np.log(train_returns+1).cumsum())
+
+train_annual_returns = (np.power(cum_train_returns.loc[cum_train_returns.shape[0]-1], 1/18) - 1)
+train_std = ((np.exp(train_returns)-1) * 100).std()
+train_sharpe = train_annual_returns / train_std
+
+# Test
+test_weights = np.where(pred_test > 0, 1, -1) / 7
+test_returns = np.sum((np.exp(true[constants.TRAIN_CUTOFF_INDEX:]) - 1) * test_weights, axis=1)
+cum_test_returns = np.exp(np.log(test_returns+1).cumsum())
+
+test_annual_returns = (np.power(cum_test_returns.loc[df.shape[0]-1], 1/5) - 1)
+test_std = ((np.exp(test_returns)-1) * 100).std()
+test_sharpe = test_annual_returns / test_std
+
+# Print backtest results
+print("Baseline")
 print("################################")
-print(mse_train)
+print(f"Annual Returns: {round(baseline_annual_returns * 100, 2)}%")
+print(f"Sharpe Ratio: {round(baseline_sharpe, 2)}")
 print("################################")
 print("\n")
-print("VAR Mean Squared Error Test")
+print("VAR Model Train")
 print("################################")
-print(mse_test)
+print(f"Annual Returns: {round(train_annual_returns * 100, 2)}%")
+print(f"Sharpe Ratio: {round(train_sharpe, 2)}")
 print("################################")
-
-
-
-
+print("VAR Model Test")
+print("################################")
+print(f"Annual Returns: {round(test_annual_returns * 100, 2)}%")
+print(f"Sharpe Ratio: {round(test_sharpe, 2)}")
+print("################################")
 
 
