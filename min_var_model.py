@@ -61,14 +61,14 @@ uniform_weights = np.ones((n, stock_num)) / stock_num
 # baseline_returns = np.sum((np.exp(rolling_mean[:]) - 1) * uniform_weights, axis=1)
 baseline_returns = np.sum((np.exp(df[:]) - 1) * uniform_weights, axis=1)
 cum_baseline_returns = np.exp(np.log(baseline_returns+1).cumsum())
-baseline_std = ((np.exp(baseline_returns)-1) * 100).std()
+baseline_std = ((np.exp(baseline_returns))).std() * pow(252, 1/2)
 
 # Use rolling average mean or daily mean, difference is still similar but at different magnitudes
 
 model_returns = np.sum((np.exp(rolling_mean[:]) - 1) * weights, axis=1)
 # model_returns = np.sum((np.exp(df[:]) - 1) * weights, axis=1)
 cum_model_returns = np.exp(np.log(model_returns+1).cumsum())
-model_std = ((np.exp(model_returns)-1) * 100).std()
+model_std = ((np.exp(model_returns))).std() * pow(252, 1/2)
 
 baseline_annual_returns = (np.power(cum_baseline_returns.loc[n-1], 1/23) - 1) 
 model_annual_returns = (np.power(cum_model_returns.loc[n-1], 1/23) - 1)

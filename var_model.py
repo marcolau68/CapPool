@@ -74,7 +74,7 @@ n = df.shape[0]
 uniform_weights = np.ones((n, stock_num)) / stock_num
 baseline_returns = np.sum((np.exp(true[:]) - 1) * uniform_weights, axis=1)
 cum_baseline_returns = np.exp(np.log(baseline_returns+1).cumsum())
-baseline_std = ((np.exp(baseline_returns)-1) * 100).std()
+baseline_std = ((np.exp(baseline_returns))).std() * pow(252, 1/2)
 
 baseline_annual_returns = (np.power(cum_baseline_returns.loc[n-1], 1/23) - 1) 
 baseline_sharpe = baseline_annual_returns / baseline_std
@@ -85,7 +85,7 @@ train_returns = np.sum((np.exp(true[:constants.TRAIN_CUTOFF_INDEX]) - 1) * train
 cum_train_returns = np.exp(np.log(train_returns+1).cumsum())
 
 train_annual_returns = (np.power(cum_train_returns.loc[cum_train_returns.shape[0]-1], 1/18) - 1)
-train_std = ((np.exp(train_returns)-1) * 100).std()
+train_std = ((np.exp(train_returns))).std() * pow(252, 1/2)
 train_sharpe = train_annual_returns / train_std
 
 # Test
@@ -94,7 +94,7 @@ test_returns = np.sum((np.exp(true[constants.TRAIN_CUTOFF_INDEX:]) - 1) * test_w
 cum_test_returns = np.exp(np.log(test_returns+1).cumsum())
 
 test_annual_returns = (np.power(cum_test_returns.loc[df.shape[0]-1], 1/5) - 1)
-test_std = ((np.exp(test_returns)-1) * 100).std()
+test_std = ((np.exp(test_returns))).std() * pow(252, 1/2)
 test_sharpe = test_annual_returns / test_std
 
 # Print backtest results
