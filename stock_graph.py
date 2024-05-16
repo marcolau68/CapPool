@@ -1,15 +1,60 @@
 import numpy as np
 import pandas as pd
+from util import constants
 
 class StockGraph:
-    def get_nodes(self, day, window=10):
+    def get_zscores(self, period):
         df = pd.read_csv("graph_data/all_zscores.csv")
         df = df.drop("Date", axis=1)
         df.reindex()
 
-        nodes = df.loc[day:day+window-1].to_numpy()
+        df = df.rolling(period).sum()[period-1::period]
+
+        return df
+    
+    def get_all_nodes(self, period=1, window=10):
+        df = self.get_zscores(period)
+        df.index = (df.index + 1) // 20
+        features = np.zeros((df.shape[0]-window+1, window, constants.NUM_STOCKS))
+
+        for i in range(window, df.shape[0]):
+            tmp = df.loc[i-window+1:i].to_numpy()
+            features[i-window] = tmp
+        
+        return features
+
+    def get_nodes(self, day, period=1, window=10):
+        df = self.get_zscores(period)
+
+        # Day is the right edge of the window, df.loc is inclusive...?
+        nodes = df.loc[day-period*window+1:day].to_numpy()
         
         return nodes
+
+    def get_all_outputs(period=1, window=10):
+        df = self.get_zscores(period)
+        df.index = (df.index + 1) // 20 # becomes 1 indexed
+        output = np.zeros((df.shape[0]-window, constants.NUM_STOCKS))
+
+        for i in range(window+1, df.shape[0]):
+            if bin:
+                output[i-window] = df.loc[i-1] < df.loc[i]
+            else:
+                output[i-window] = df.loc[i]
+        
+        return output
+    
+    def get_output(self, day, period=1, bin=True):
+        df = self.get_zscores(period)
+        output = None
+
+        if bin:
+            output = df.loc[day-period] < df.loc[day]
+            output.replace({False: -1, True: 1}, inplace=True)
+        else:
+            output = df.loc[day]
+
+        return np.array(output)        
     
     def get_edge_matrix(self, mode="precision"):
         modes = ["correlation", "dtw", "precision"]
@@ -47,7 +92,6 @@ class StockGraph:
 
         edge_indices = [[], []]
         edge_weights = []
-        print(threshold)
         
         for i in range(n):
             for j in range(i, m):
@@ -78,13 +122,19 @@ class StockGraph:
         return np.array(edge_indices), np.array(edge_weights)
 
 graph = StockGraph()
-nodes = graph.get_nodes(day=1000, window=3)
+nodes = graph.get_nodes(day=299, period=20, window=3)
 edges = graph.get_edge_matrix()
-
 edge_indices, edge_weights = graph.get_edge_dict(mode="correlation")
-print(edge_indices.shape)
-print(edge_weights.shape)
+out = graph.get_output(99, period=20, bin=False)
+zscores = graph.get_zscores(200)
 
+all_nodes = graph.get_all_nodes(period=20, window=3)
+
+# print(edge_indices.shape)
+# print(edge_weights.shape)
+# print(nodes.shape)
+
+print(all_nodes.shape)
 
 # print(edges.shape)
 

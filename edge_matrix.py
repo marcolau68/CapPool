@@ -14,9 +14,28 @@ def get_covariance(x, y):
     # -inf to inf.
     return np.cov(x, y)[0][1]
 
-def write_zscore_data():
+# def write_zscore_data():
+#     directory = "processed_data"
+#     all_data = pd.read_csv(f"{directory}/{constants.TICKERS[0]}_zscores.csv", index_col="Date")
+#     all_data = all_data.rename(columns={"log_returns_zscore": f"{constants.TICKERS[0]}_log_returns_zscore"})
+
+#     for i in range(1, len(constants.TICKERS)):
+#         ticker = constants.TICKERS[i]
+#         df = pd.read_csv(f"{directory}/{ticker}_zscores.csv", index_col="Date")
+#         df = df.rename(columns={"log_returns_zscore": f"{constants.TICKERS[i]}_log_returns_zscore"})
+
+#         all_data = all_data.join(df)
+
+#     # print(all_data.isna().sum())
+#     all_data.fillna(value=0, inplace=True)
+    
+#     all_data.to_csv("graph_data/all_zscores.csv")
+
+#     return None
+
+def write_zscore_data(period=1):
     directory = "processed_data"
-    all_data = pd.read_csv(f"{directory}/{constants.TICKERS[0]}_zscores.csv", index_col="Date")
+    all_data = pd.read_csv(f"{directory}/{constants.TICKERS[0]}_zscores_period={period}.csv", index_col="Date")
     all_data = all_data.rename(columns={"log_returns_zscore": f"{constants.TICKERS[0]}_log_returns_zscore"})
 
     for i in range(1, len(constants.TICKERS)):
@@ -26,10 +45,9 @@ def write_zscore_data():
 
         all_data = all_data.join(df)
 
-    # print(all_data.isna().sum())
     all_data.fillna(value=0, inplace=True)
     
-    all_data.to_csv("graph_data/all_zscores.csv")
+    all_data.to_csv(f"graph_data/all_zscores_period={period}.csv")
 
     return None
 
@@ -110,8 +128,10 @@ def write_edge_matrix(mode="precision"):
 
 
 
-write_edge_matrix("dtw")
+# write_edge_matrix("dtw")
 
 # print(all_data)
+
+write_zscore_data(period=5)
 
 

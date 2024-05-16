@@ -43,4 +43,7 @@ EDGE_MODES = ["correlation", "dtw", "precision"]
 # Train Test Split Date
 TRAIN_CUTOFF_INDEX = 4530
 
+# Number of stocks
+NUM_STOCKS = 501
+
 

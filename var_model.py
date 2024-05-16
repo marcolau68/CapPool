@@ -97,6 +97,7 @@ test_annual_returns = (np.power(cum_test_returns.loc[df.shape[0]-1], 1/5) - 1)
 test_std = ((np.exp(test_returns))).std() * pow(252, 1/2)
 test_sharpe = test_annual_returns / test_std
 
+
 # Print backtest results
 print("Baseline")
 print("################################")
