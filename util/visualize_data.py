@@ -31,3 +31,5 @@ plt.title("Apple vs General Electrics Log Returns Z-score")
 
 plt.show()
 
+
+

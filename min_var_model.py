@@ -67,8 +67,8 @@ model_returns = np.sum((np.exp(df[:]) - 1) * weights, axis=1)
 cum_model_returns = np.exp(np.log(model_returns+1).cumsum())
 model_std = ((np.exp(model_returns))).std() * pow(252, 1/2)
 
-baseline_annual_returns = (np.power(cum_baseline_returns.loc[n-1], 1/23) - 1) 
-model_annual_returns = (np.power(cum_model_returns.loc[n-1], 1/23) - 1)
+baseline_annual_returns = (np.power(cum_baseline_returns.loc[n-1], 1/24) - 1) 
+model_annual_returns = (np.power(cum_model_returns.loc[n-1], 1/24) - 1)
 
 baseline_sharpe = baseline_annual_returns / baseline_std
 model_sharpe = model_annual_returns / model_std

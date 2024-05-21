@@ -65,7 +65,7 @@ def var_process_data():
 
 ticker = "A"
 # process_data(ticker, 252, period=1)
-process_all_data(window=50, period=5)
+process_all_data(window=20, period=10)
 
 # var_process_data()
 

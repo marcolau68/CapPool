@@ -2,10 +2,12 @@ import numpy as np
 import pandas as pd
 from statsmodels.tsa.api import VAR
 from util import constants
+import matplotlib.pyplot as plt
+import datetime as dt
 
 # Read data
 df = pd.read_csv("benchmark_data/all_log_returns.csv")
-dates = df["Date"]
+dates = [dt.datetime.strptime(d, "%Y-%m-%d").date() for d in df["Date"]]
 df.drop(columns=["Date"], inplace=True)
 
 # Set up VAR model and fit
@@ -76,7 +78,7 @@ baseline_returns = np.sum((np.exp(true[:]) - 1) * uniform_weights, axis=1)
 cum_baseline_returns = np.exp(np.log(baseline_returns+1).cumsum())
 baseline_std = ((np.exp(baseline_returns))).std() * pow(252, 1/2)
 
-baseline_annual_returns = (np.power(cum_baseline_returns.loc[n-1], 1/23) - 1) 
+baseline_annual_returns = (np.power(cum_baseline_returns.loc[n-1], 1/24) - 1) 
 baseline_sharpe = baseline_annual_returns / baseline_std
 
 # Train
@@ -93,7 +95,7 @@ test_weights = np.where(pred_test > 0, 1, -1) / 7
 test_returns = np.sum((np.exp(true[constants.TRAIN_CUTOFF_INDEX:]) - 1) * test_weights, axis=1)
 cum_test_returns = np.exp(np.log(test_returns+1).cumsum())
 
-test_annual_returns = (np.power(cum_test_returns.loc[df.shape[0]-1], 1/5) - 1)
+test_annual_returns = (np.power(cum_test_returns.loc[df.shape[0]-1], 1/6) - 1)
 test_std = ((np.exp(test_returns))).std() * pow(252, 1/2)
 test_sharpe = test_annual_returns / test_std
 
@@ -117,3 +119,14 @@ print(f"Sharpe Ratio: {round(test_sharpe, 2)}")
 print("################################")
 
 
+print(test_weights[test_weights > 0].sum())
+print(test_weights.shape)
+
+
+plt.plot(dates[constants.TRAIN_CUTOFF_INDEX:], cum_test_returns, label="VAR test cumulative returns")
+plt.plot(dates[constants.TRAIN_CUTOFF_INDEX:], cum_baseline_returns[constants.TRAIN_CUTOFF_INDEX:]/cum_baseline_returns[constants.TRAIN_CUTOFF_INDEX], label="Baseline cumulative returns")
+plt.xlabel("Time")
+plt.ylabel("Cumulative Returns")
+plt.title("Vector Autoregressive Model Testing Cumulative Returns")
+plt.legend(loc="upper left")
+plt.show()

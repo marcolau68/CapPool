@@ -132,6 +132,6 @@ def write_edge_matrix(mode="precision"):
 
 # print(all_data)
 
-write_zscore_data(period=5)
+write_zscore_data(period=10)
 
 
