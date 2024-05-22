@@ -45,5 +45,12 @@ for j in range(51):
 
 s_3 = np.matmul(s_1, s_2)
 
-print(s_3)
-print(s_3.shape)
+
+print(s_1.T.shape)
+print(s_2.T.shape)
+
+s_4 = np.matmul(s_2.T, s_1.T)
+print(s_4.shape)
+
+
+
