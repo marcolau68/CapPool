@@ -45,10 +45,10 @@ compare_test = pred_test.where(pred_test * true[constants.TRAIN_CUTOFF_INDEX:] >
 var_accuracy_test = compare_test.count() / test_total
 
 # Calculate VAR MSE
-mse = (selected_resid ** 2).mean()
+# mse = (selected_resid ** 2).mean()
 
-mse_train = ((true[:constants.TRAIN_CUTOFF_INDEX] - pred_train[:constants.TRAIN_CUTOFF_INDEX]) ** 2).mean()
-mse_test = ((true[constants.TRAIN_CUTOFF_INDEX:] - pred_test[constants.TRAIN_CUTOFF_INDEX:]) ** 2).mean()
+# mse_train = ((true[:constants.TRAIN_CUTOFF_INDEX] - pred_train[:constants.TRAIN_CUTOFF_INDEX]) ** 2).mean()
+# mse_test = ((true[constants.TRAIN_CUTOFF_INDEX:] - pred_test[constants.TRAIN_CUTOFF_INDEX:]) ** 2).mean()
 
 
 # Print accuracy results
@@ -91,9 +91,15 @@ train_std = ((np.exp(train_returns))).std() * pow(252, 1/2)
 train_sharpe = train_annual_returns / train_std
 
 # Test
-test_weights = np.where(pred_test > 0, 1, -1) / 7
-test_returns = np.sum((np.exp(true[constants.TRAIN_CUTOFF_INDEX:]) - 1) * test_weights, axis=1)
-cum_test_returns = np.exp(np.log(test_returns+1).cumsum())
+# test_weights = np.where(pred_test > 0, 1, -1) / 7
+# test_returns = np.sum((np.exp(true[constants.TRAIN_CUTOFF_INDEX:]) - 1) * test_weights, axis=1)
+# cum_test_returns = np.exp(np.log(test_returns+1).cumsum())
+test_returns = pred_test
+cum_test_returns = np.exp(pred_test.cumsum())
+
+# pred_test is the prediction of log returns, just plot the aggregate of the pred_test
+# should be a straight line with positive slope
+# plot entire past history and forecast
 
 test_annual_returns = (np.power(cum_test_returns.loc[df.shape[0]-1], 1/6) - 1)
 test_std = ((np.exp(test_returns))).std() * pow(252, 1/2)
@@ -119,9 +125,10 @@ print(f"Sharpe Ratio: {round(test_sharpe, 2)}")
 print("################################")
 
 
-print(test_weights[test_weights > 0].sum())
-print(test_weights.shape)
-
+# print(test_weights.shape)
+# print(pred_test)
+# print((test_weights == 1/7).sum())
+# print((test_weights == -1/7).sum())
 
 plt.plot(dates[constants.TRAIN_CUTOFF_INDEX:], cum_test_returns, label="VAR test cumulative returns")
 plt.plot(dates[constants.TRAIN_CUTOFF_INDEX:], cum_baseline_returns[constants.TRAIN_CUTOFF_INDEX:]/cum_baseline_returns[constants.TRAIN_CUTOFF_INDEX], label="Baseline cumulative returns")
