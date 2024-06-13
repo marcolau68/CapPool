@@ -31,7 +31,7 @@ class StockGraph:
         
         return nodes
 
-    def get_all_outputs(period=1, window=10):
+    def get_all_outputs(self, period=1, window=10):
         df = self.get_zscores(period)
         df.index = (df.index + 1) // 20 # becomes 1 indexed
         output = np.zeros((df.shape[0]-window, constants.NUM_STOCKS))
@@ -124,7 +124,7 @@ class StockGraph:
 graph = StockGraph()
 nodes = graph.get_nodes(day=299, period=20, window=3)
 edges = graph.get_edge_matrix()
-edge_indices, edge_weights = graph.get_edge_dict(mode="correlation")
+edge_indices, edge_weights = graph.get_edge_dict(mode="precision")
 out = graph.get_output(99, period=20, bin=False)
 zscores = graph.get_zscores(200)
 

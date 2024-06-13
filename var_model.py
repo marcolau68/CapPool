@@ -91,11 +91,12 @@ train_std = ((np.exp(train_returns))).std() * pow(252, 1/2)
 train_sharpe = train_annual_returns / train_std
 
 # Test
-# test_weights = np.where(pred_test > 0, 1, -1) / 7
-# test_returns = np.sum((np.exp(true[constants.TRAIN_CUTOFF_INDEX:]) - 1) * test_weights, axis=1)
-# cum_test_returns = np.exp(np.log(test_returns+1).cumsum())
-test_returns = pred_test
-cum_test_returns = np.exp(pred_test.cumsum())
+test_weights = np.where(pred_test > 0, 1, -1) / 7
+test_returns = np.sum((np.exp(true[constants.TRAIN_CUTOFF_INDEX:]) - 1) * test_weights, axis=1)
+cum_test_returns = np.exp(np.log(test_returns+1).cumsum())
+
+forecast_returns = np.sum((np.exp(pred_test) - 1) * uniform_weights[:1507], axis=1)
+cum_forecast_returns = np.exp(forecast_returns.cumsum())
 
 # pred_test is the prediction of log returns, just plot the aggregate of the pred_test
 # should be a straight line with positive slope
@@ -125,15 +126,12 @@ print(f"Sharpe Ratio: {round(test_sharpe, 2)}")
 print("################################")
 
 
-# print(test_weights.shape)
-# print(pred_test)
-# print((test_weights == 1/7).sum())
-# print((test_weights == -1/7).sum())
 
-plt.plot(dates[constants.TRAIN_CUTOFF_INDEX:], cum_test_returns, label="VAR test cumulative returns")
-plt.plot(dates[constants.TRAIN_CUTOFF_INDEX:], cum_baseline_returns[constants.TRAIN_CUTOFF_INDEX:]/cum_baseline_returns[constants.TRAIN_CUTOFF_INDEX], label="Baseline cumulative returns")
+plt.plot(dates[constants.TRAIN_CUTOFF_INDEX:], cum_forecast_returns * cum_baseline_returns[constants.TRAIN_CUTOFF_INDEX], label="VAR cumulative returns forecast")
+# plt.plot(dates[constants.TRAIN_CUTOFF_INDEX:], cum_baseline_returns[constants.TRAIN_CUTOFF_INDEX:]/cum_baseline_returns[constants.TRAIN_CUTOFF_INDEX], label="Baseline cumulative returns")
+plt.plot(dates, cum_baseline_returns, label="Baseline cumulative returns")
 plt.xlabel("Time")
 plt.ylabel("Cumulative Returns")
-plt.title("Vector Autoregressive Model Testing Cumulative Returns")
+plt.title("Vector Autoregressive Model Cumulative Returns Forecast")
 plt.legend(loc="upper left")
 plt.show()

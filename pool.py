@@ -53,5 +53,3 @@ s_4 = np.matmul(s_2.T, s_1.T)
 print(s_4.shape)
 
 
-
-
